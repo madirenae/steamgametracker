@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameTrack</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">🎮 GameTracker</div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="Search players...">
+        <select>
+            <option>All Genres</option>
+            <option>FPS</option>
+            <option>RPG</option>
+            <option>Sports</option>
+        </select>
+    </div>
+
+    <div class="nav-buttons">
+        <button>Search</button>
+        <button>Add Stats</button>
+        <button>Profile</button>
+    </div>
+</header>
+
+<main class="dashboard">
+
+<section class="profile-card">
+    <h2>Madi</h2>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <h3>1245</h3>
+            <p>Total Hours</p>
+        </div>
+        <div class="stat-box">
+            <h3>32</h3>
+            <p>Completed</p>
+        </div>
+        <div class="stat-box">
+            <h3>540</h3>
+            <p>Achievements</p>
+        </div>
+    </div>
+</section>
+
+<section class="rawg-search">
+    <h2>Search and Add Favorite Games</h2>
+    <input type="text" id="rawgSearchInput" placeholder="Enter game name..." />
+    <button onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
+        Add Game to Favorites
+    </button>
+</section>
+
+<section class="favorites-section">
+    <h2>Your Favorite Games</h2>
+    <div id="favoritesContainer" class="favorites-container"></div>
+</section>
+
+<section class="statistics-card">
+    <h3>Statistics Overview</h3>
+    <ul>
+        <li>Most Played Genre: FPS</li>
+        <li>Favorite Platform: PC</li>
+        <li>Average Rating: 4.5 / 5</li>
+        <li>Current Goal: </li>
+    </ul>
+</section>
+
+<section class="notes-card">
+    <h3>Private Notes</h3>
+    <textarea placeholder="..."></textarea>
+</section>
+
+</main>
+
+<footer class="footer">
+    <p>Twitter | Twitch | Team XYZ Esports</p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

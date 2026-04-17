@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 const passport = require("passport");
 const SteamStrategy = require("passport-steam").Strategy;
 const session = require("express-session");
@@ -23,15 +23,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ================= DATABASE =================
-const db = new sqlite3.Database("database.db");
+const db = new Database("database.db");
 
-db.run(`
+db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT
     )
-`);
+`).run();
 
 const SECRET = process.env.SECRET || "supersecretkey";
 
@@ -39,48 +39,46 @@ const SECRET = process.env.SECRET || "supersecretkey";
 app.post("/api/register", async (req, res) => {
     const { username, password } = req.body;
 
-    const hashed = await bcrypt.hash(password, 10);
+    try {
+        const hashed = await bcrypt.hash(password, 10);
 
-    db.run(
-        "INSERT INTO users (username, password) VALUES (?, ?)",
-        [username, hashed],
-        function (err) {
-            if (err) {
-                return res.status(400).json({ message: "Username already exists" });
-            }
+        db.prepare(`
+            INSERT INTO users (username, password)
+            VALUES (?, ?)
+        `).run(username, hashed);
 
-            res.json({ message: "User created" });
-        }
-    );
+        res.json({ message: "User created" });
+
+    } catch (err) {
+        res.status(400).json({ message: "Username already exists" });
+    }
 });
 
 // ================= AUTH (LOGIN) =================
 app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
 
-    db.get(
-        "SELECT * FROM users WHERE username = ?",
-        [username],
-        async (err, user) => {
-            if (!user) {
-                return res.status(400).json({ message: "User not found" });
-            }
+    const user = db.prepare(`
+        SELECT * FROM users WHERE username = ?
+    `).get(username);
 
-            const valid = await bcrypt.compare(password, user.password);
+    if (!user) {
+        return res.status(400).json({ message: "User not found" });
+    }
 
-            if (!valid) {
-                return res.status(401).json({ message: "Wrong password" });
-            }
+    const valid = await bcrypt.compare(password, user.password);
 
-            const token = jwt.sign(
-                { id: user.id, username },
-                SECRET,
-                { expiresIn: "1h" }
-            );
+    if (!valid) {
+        return res.status(401).json({ message: "Wrong password" });
+    }
 
-            res.json({ token });
-        }
+    const token = jwt.sign(
+        { id: user.id, username },
+        SECRET,
+        { expiresIn: "1h" }
     );
+
+    res.json({ token });
 });
 
 // ================= PROTECTED ROUTE =================
@@ -120,7 +118,6 @@ app.get("/auth/steam/return",
     (req, res) => {
         const steamId = req.user.id;
 
-        // send Steam ID back to frontend
         res.redirect(`/?steamId=${steamId}`);
     }
 );

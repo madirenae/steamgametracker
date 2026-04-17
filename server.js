@@ -2,75 +2,88 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const Database = require("better-sqlite3");
+const sqlite3 = require("sqlite3").verbose();
 const passport = require("passport");
 const SteamStrategy = require("passport-steam").Strategy;
 const session = require("express-session");
 
 const app = express();
+
+// ================= MIDDLEWARE =================
 app.use(express.json());
 app.use(cors());
 
-const db = new Database("database.db");
-const SECRET = process.env.SECRET || "supersecretkey";
+app.use(session({
+    secret: "steam",
+    resave: false,
+    saveUninitialized: true
+}));
 
-// Create table
-db.prepare(`
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ================= DATABASE =================
+const db = new sqlite3.Database("database.db");
+
+db.run(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT
     )
-`).run();
+`);
 
+const SECRET = process.env.SECRET || "supersecretkey";
 
-// REGISTER
+// ================= AUTH (REGISTER) =================
 app.post("/api/register", async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-        const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
-        db.prepare(`
-            INSERT INTO users (username, password)
-            VALUES (?, ?)
-        `).run(username, hashed);
+    db.run(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        [username, hashed],
+        function (err) {
+            if (err) {
+                return res.status(400).json({ message: "Username already exists" });
+            }
 
-        res.json({ message: "User created" });
-
-    } catch (err) {
-        res.status(400).json({ message: "Username already exists" });
-    }
+            res.json({ message: "User created" });
+        }
+    );
 });
 
-
-// LOGIN
+// ================= AUTH (LOGIN) =================
 app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
 
-    const user = db.prepare(`
-        SELECT * FROM users WHERE username = ?
-    `).get(username);
+    db.get(
+        "SELECT * FROM users WHERE username = ?",
+        [username],
+        async (err, user) => {
+            if (!user) {
+                return res.status(400).json({ message: "User not found" });
+            }
 
-    if (!user) {
-        return res.status(400).json({ message: "User not found" });
-    }
+            const valid = await bcrypt.compare(password, user.password);
 
-    const valid = await bcrypt.compare(password, user.password);
+            if (!valid) {
+                return res.status(401).json({ message: "Wrong password" });
+            }
 
-    if (!valid) {
-        return res.status(401).json({ message: "Wrong password" });
-    }
+            const token = jwt.sign(
+                { id: user.id, username },
+                SECRET,
+                { expiresIn: "1h" }
+            );
 
-    const token = jwt.sign({ id: user.id, username }, SECRET, {
-        expiresIn: "1h"
-    });
-
-    res.json({ token });
+            res.json({ token });
+        }
+    );
 });
 
-
-// PROTECTED ROUTE
+// ================= PROTECTED ROUTE =================
 app.get("/api/profile", (req, res) => {
     const auth = req.headers.authorization;
     if (!auth) return res.sendStatus(401);
@@ -84,22 +97,7 @@ app.get("/api/profile", (req, res) => {
     }
 });
 
-app.get("/api/steam-user", (req, res) => {
-    if (!req.user) {
-        return res.json({});
-    }
-
-    res.json({
-        steamId: req.user.id
-    });
-});
-
-app.use(session({
-    secret: "steam",
-    resave: false,
-    saveUninitialized: true
-}));
-
+// ================= STEAM AUTH =================
 passport.use(new SteamStrategy({
     returnURL: "https://steamgametracker.onrender.com/auth/steam/return",
     realm: "https://steamgametracker.onrender.com/",
@@ -112,9 +110,7 @@ passport.use(new SteamStrategy({
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-app.use(passport.initialize());
-app.use(passport.session());
-
+// ================= STEAM ROUTES =================
 app.get("/auth/steam",
     passport.authenticate("steam")
 );
@@ -129,5 +125,20 @@ app.get("/auth/steam/return",
     }
 );
 
+// ================= GET STEAM USER =================
+app.get("/api/steam-user", (req, res) => {
+    if (!req.user) {
+        return res.json({});
+    }
+
+    res.json({
+        steamId: req.user.id
+    });
+});
+
+// ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

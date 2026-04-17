@@ -6,6 +6,7 @@ const passport = require("passport");
 const SteamStrategy = require("passport-steam").Strategy;
 const session = require("express-session");
 const { createClient } = require("@supabase/supabase-js");
+const path = require("path");
 
 const app = express();
 
@@ -21,6 +22,14 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ================= SERVE FRONTEND =================
+// serves index.html, styles.css, script.js, etc.
+app.use(express.static(path.join(__dirname, ".")));
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
 
 // ================= SUPABASE =================
 const supabase = createClient(
@@ -98,11 +107,24 @@ app.get("/auth/steam/return",
     passport.authenticate("steam", { failureRedirect: "/" }),
     (req, res) => {
         const steamId = req.user.id;
+
+        // send Steam ID to frontend
         res.redirect(`/?steamId=${steamId}`);
     }
 );
 
-// ================= START =================
+// ================= GET STEAM USER =================
+app.get("/api/steam-user", (req, res) => {
+    if (!req.user) {
+        return res.json({});
+    }
+
+    res.json({
+        steamId: req.user.id
+    });
+});
+
+// ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

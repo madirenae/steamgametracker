@@ -117,3 +117,15 @@ async function loadTopGames(steamId) {
         console.error("Games failed:", err);
     }
 }
+
+async function getGenre(gameName) {
+    const res = await fetch(
+        `https://api.rawg.io/api/games?key=YOUR_KEY&search=${gameName}`
+    );
+
+    const data = await res.json();
+
+    if (!data.results.length) return "Unknown";
+
+    return data.results[0].genres[0]?.name || "Unknown";
+}

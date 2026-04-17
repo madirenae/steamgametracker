@@ -153,3 +153,14 @@ app.get("/api/steam/games/:id", async (req, res) => {
     const data = await response.json();
     res.json(data);
 });
+
+app.get("/api/steam/achievements/:steamId/:appId", async (req, res) => {
+    const { steamId, appId } = req.params;
+
+    const response = await fetch(
+        `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key=${process.env.STEAM_API_KEY}&steamid=${steamId}&appid=${appId}`
+    );
+
+    const data = await response.json();
+    res.json(data);
+});

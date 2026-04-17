@@ -33,7 +33,7 @@ function connectSteam() {
 }
 
 function showLogin() {
-    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("homePage").style.display = "block";
     document.getElementById("profilePage").style.display = "none";
 }
 
@@ -44,8 +44,8 @@ function logout() {
 
 
 // ================= PROFILE =================
-async function showProfile() {
-    document.getElementById("loginPage").style.display = "none";
+function showProfile() {
+    document.getElementById("homePage").style.display = "none";
     document.getElementById("profilePage").style.display = "block";
 
     const steamId = localStorage.getItem("steamId");
@@ -55,8 +55,8 @@ async function showProfile() {
         return;
     }
 
-    await loadSteamProfile(steamId);
-    await loadTopGames(steamId);
+    loadSteamProfile(steamId);
+    loadTopGames(steamId);
 }
 
 

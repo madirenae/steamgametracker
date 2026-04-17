@@ -2,12 +2,35 @@ const rawgApiKey = "f1bd90ccfc614510a63efb93f4b4d404";
 const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
 const steamId = "76561199072391001";
 
+const Database = require("better-sqlite3");
+const db = new Database("database.db");
+
+const SECRET = process.env.SECRET;
+
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT
+    )
+`).run();
+
 
 document.addEventListener("DOMContentLoaded", () => {
     createSparks();
-    showHome();
-});
 
+    const user = localStorage.getItem("token");
+
+    if (user) {
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        showProfile();
+    } else {
+        document.getElementById("loginPage").style.display = "block";
+        document.getElementById("app").style.display = "none";
+        showHome();
+    }
+});
 
 async function showProfile() {
     document.getElementById("homePage").style.display = "none";
@@ -199,7 +222,7 @@ async function loadTopSteamGames() {
             .sort((a, b) => b.playtime_forever - a.playtime_forever)
             .slice(0, 5);
 
-        container.innerHTML = "<p>Loaded!</p>";
+        container.innerHTML = "";
 
   for (let g of top) {
     try {
@@ -352,7 +375,8 @@ async function calculateTopGenre() {
 
 
 function getUserNotesKey() {
-    return "notes_guest";
+    const user = localStorage.getItem("user") || "guest";
+    return "notes_" + user;
 }
 
 function loadNotesList() {
@@ -434,4 +458,72 @@ function createSparks() {
         s.style.left = Math.random() * 100 + "%";
         document.body.appendChild(s);
     }
+}
+
+async function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+        alert("Please enter username and password");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Login failed");
+            return;
+        }
+
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("app").style.display = "block";
+
+            showProfile();
+        }
+
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Server error. Is your backend running?");
+    }
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    location.reload();
+}
+
+async function register() {
+   app.post("/api/register", async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const hashed = await bcrypt.hash(password, 10);
+
+        db.prepare(`
+            INSERT INTO users (username, password)
+            VALUES (?, ?)
+        `).run(username, hashed);
+
+        res.json({ message: "User created" });
+
+    } catch (err) {
+        res.status(400).json({ message: "Username already exists" });
+    }
+});
+
+    const data = await res.json();
+    alert(data.message);
 }

@@ -6,7 +6,9 @@
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #1a0000, #0d0000 60%, #000000);
+    background: linear-gradient(-45deg, #000000, #1a0000, #330000, #000000);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
     color: white;
     min-height: 100vh;
 }
@@ -157,4 +159,125 @@ button:hover {
     text-align: center;
     padding: 20px;
     background: rgba(20, 0, 0, 0.8);
+}
+
+.home-hero {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.home-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.home-hero p {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    color: #ccc;
+}
+
+.hero-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+}
+
+.home-features {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    width: 250px;
+    background: rgba(30, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.sparks {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.sparks span {
+    position: absolute;
+    display: block;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 0, 0, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.9);
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+    }
+}
+
+.note-item {
+    background: rgba(255, 0, 0, 0.2);
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note-text {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.note-time {
+    font-size: 0.75rem;
+    color: #aaa;
+}
+
+.note-item button {
+    background: red;
+    border: none;
+    color: white;
+    padding: 5px 8px;
+    margin-left: 5px;
+    border-radius: 5px;
+    cursor: pointer;
 }

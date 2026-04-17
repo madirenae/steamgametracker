@@ -7,23 +7,56 @@
 </head>
 <body>
 
+<div class="sparks"></div>
+
+<!-- ================= HOME PAGE ================= -->
+<section id="homePage">
+
 <header class="header">
     <div class="logo">🎮 GameTracker</div>
 
-    <div class="search-bar">
-        <input type="text" placeholder="Search players...">
-        <select>
-            <option>All Genres</option>
-            <option>FPS</option>
-            <option>RPG</option>
-            <option>Sports</option>
-        </select>
+    <div class="nav-buttons">
+        <button type="button" onclick="showProfile()">Profile</button>
+    </div>
+</header>
+
+<div class="home-hero">
+    <h1>Track Your Gaming Like Never Before</h1>
+    <p>All your favorite games, stats, and achievements in one place.</p>
+    <button type="button" class="hero-btn" onclick="showProfile()">Get Started</button>
+</div>
+
+<!-- ✅ RESTORED FEATURES -->
+<div class="home-features">
+
+    <div class="feature-card">
+        <h3>Track Playtime</h3>
+        <p>Automatically view your total hours and most played games from Steam.</p>
     </div>
 
+    <div class="feature-card">
+        <h3>Save Favorites</h3>
+        <p>Add and organize your favorite games using live game data.</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>View Stats</h3>
+        <p>Analyze your gaming habits with clean and simple statistics.</p>
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ================= PROFILE PAGE ================= -->
+<section id="profilePage" style="display: none;">
+
+<header class="header">
+    <div class="logo">🎮 GameTracker</div>
+
     <div class="nav-buttons">
-        <button>Search</button>
-        <button>Add Stats</button>
-        <button>Profile</button>
+        <button type="button" onclick="showHome()">Home</button>
     </div>
 </header>
 
@@ -31,26 +64,45 @@
 
 <section class="profile-card">
     <h2>Madi</h2>
+
+    <section class="add-stats-card">
+        <h3>Add / Update Stats</h3>
+
+        <input type="number" id="hoursInput" placeholder="Enter hours played" />
+        <input type="number" id="achievementsInput" placeholder="Enter achievements" />
+
+        <select id="platformInput">
+    <option value="PC">PC</option>
+    <option value="Xbox">Xbox</option>
+    <option value="PlayStation">PlayStation</option>
+    <option value="Switch">Switch</option>
+</select>
+
+        <button type="button" onclick="addStats()">Save Stats</button>
+    </section>
+
     <div class="stats-grid">
         <div class="stat-box">
-            <h3>1245</h3>
+            <h3 id="totalHours">0</h3>
             <p>Total Hours</p>
         </div>
+
         <div class="stat-box">
-            <h3>32</h3>
-            <p>Completed</p>
-        </div>
-        <div class="stat-box">
-            <h3>540</h3>
+            <h3 id="totalAchievements">0</h3>
             <p>Achievements</p>
         </div>
     </div>
 </section>
 
+<section class="top-games-section">
+    <h3>Top 5 Most Played Games</h3>
+    <div id="topGamesContainer" class="favorites-container"></div>
+</section>
+
 <section class="rawg-search">
     <h2>Search and Add Favorite Games</h2>
     <input type="text" id="rawgSearchInput" placeholder="Enter game name..." />
-    <button onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
+    <button type="button" onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
         Add Game to Favorites
     </button>
 </section>
@@ -60,19 +112,21 @@
     <div id="favoritesContainer" class="favorites-container"></div>
 </section>
 
+<!-- ✅ UPDATED STATS OVERVIEW -->
 <section class="statistics-card">
     <h3>Statistics Overview</h3>
     <ul>
-        <li>Most Played Genre: FPS</li>
-        <li>Favorite Platform: PC</li>
-        <li>Average Rating: 4.5 / 5</li>
-        <li>Current Goal: </li>
+        <li>Most Played Genre: <span id="topGenre">Loading...</span></li>
+        <li>Favorite Platform: <span id="topPlatform">Loading...</span></li>
     </ul>
 </section>
 
 <section class="notes-card">
     <h3>Private Notes</h3>
-    <textarea placeholder="..."></textarea>
+
+    <textarea id="notesInput" placeholder="Type a note and press Enter..."></textarea>
+
+    <div id="notesList"></div>
 </section>
 
 </main>
@@ -80,6 +134,8 @@
 <footer class="footer">
     <p>Twitter | Twitch | Team XYZ Esports</p>
 </footer>
+
+</section>
 
 <script src="script.js"></script>
 

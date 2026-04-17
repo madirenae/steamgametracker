@@ -64,11 +64,10 @@ function showProfile() {
 async function loadSteamProfile(steamId) {
     try {
         const res = await fetch(
-            `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${steamApiKey}&steamids=${steamId}`
+            `https://steamgametracker.onrender.com/api/steam/profile/${steamId}`
         );
 
         const data = await res.json();
-
         const user = data.response.players[0];
 
         if (!user) return;
@@ -85,7 +84,7 @@ async function loadSteamProfile(steamId) {
 async function loadTopGames(steamId) {
     try {
         const res = await fetch(
-            `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${steamApiKey}&steamid=${steamId}&include_appinfo=true&format=json`
+            `https://steamgametracker.onrender.com/api/steam/games/${steamId}`
         );
 
         const data = await res.json();

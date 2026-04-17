@@ -130,3 +130,26 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+app.get("/api/steam/profile/:id", async (req, res) => {
+    const steamId = req.params.id;
+
+    const response = await fetch(
+        `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${process.env.STEAM_API_KEY}&steamids=${steamId}`
+    );
+
+    const data = await response.json();
+    res.json(data);
+});
+
+
+app.get("/api/steam/games/:id", async (req, res) => {
+    const steamId = req.params.id;
+
+    const response = await fetch(
+        `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamId}&include_appinfo=true&format=json`
+    );
+
+    const data = await response.json();
+    res.json(data);
+});

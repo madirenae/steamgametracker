@@ -1,22 +1,18 @@
 const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
+const rawgApiKey = "f1bd90ccfc614510a63efb93f4b4d404";
 
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
     const params = new URLSearchParams(window.location.search);
     let steamId = params.get("steamId");
 
-    // ✅ If coming back from Steam login
     if (steamId) {
         localStorage.setItem("steamId", steamId);
-
-        // clean URL
         window.history.replaceState({}, document.title, "/");
-
         showProfile();
         return;
     }
 
-    // ✅ If already logged in
     steamId = localStorage.getItem("steamId");
 
     if (steamId) {
@@ -25,7 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         showLogin();
     }
 });
-
 
 // ================= LOGIN =================
 function connectSteam() {
@@ -42,23 +37,17 @@ function logout() {
     showLogin();
 }
 
-
 // ================= PROFILE =================
-function showProfile() {
+async function showProfile() {
     document.getElementById("homePage").style.display = "none";
     document.getElementById("profilePage").style.display = "block";
 
     const steamId = localStorage.getItem("steamId");
+    if (!steamId) return;
 
-    if (!steamId) {
-        console.error("No Steam ID found");
-        return;
-    }
-
-    loadSteamProfile(steamId);
-    loadTopGames(steamId);
+    await loadSteamProfile(steamId);
+    await loadTopGames(steamId);
 }
-
 
 // ================= LOAD PROFILE =================
 async function loadSteamProfile(steamId) {
@@ -79,6 +68,58 @@ async function loadSteamProfile(steamId) {
     }
 }
 
+// ================= RAWG IMAGE =================
+async function getGameImage(gameName) {
+    try {
+        const res = await fetch(
+            `https://api.rawg.io/api/games?key=${rawgApiKey}&search=${encodeURIComponent(gameName)}`
+        );
+
+        const data = await res.json();
+
+        if (!data.results.length) return null;
+
+        return data.results[0].background_image;
+
+    } catch {
+        return null;
+    }
+}
+
+// ================= CALCULATE GENRE =================
+async function calculateTopGenre(games) {
+    const genreCount = {};
+
+    for (const g of games) {
+        try {
+            const res = await fetch(
+                `https://api.rawg.io/api/games?key=${rawgApiKey}&search=${encodeURIComponent(g.name)}`
+            );
+
+            const data = await res.json();
+            if (!data.results.length) continue;
+
+            const genres = data.results[0].genres;
+
+            genres.forEach(genre => {
+                genreCount[genre.name] = (genreCount[genre.name] || 0) + 1;
+            });
+
+        } catch {}
+    }
+
+    let topGenre = "Unknown";
+    let max = 0;
+
+    for (const g in genreCount) {
+        if (genreCount[g] > max) {
+            max = genreCount[g];
+            topGenre = g;
+        }
+    }
+
+    document.getElementById("topGenre").textContent = topGenre;
+}
 
 // ================= LOAD GAMES =================
 async function loadTopGames(steamId) {
@@ -88,7 +129,6 @@ async function loadTopGames(steamId) {
         );
 
         const data = await res.json();
-
         const container = document.getElementById("topGamesContainer");
         container.innerHTML = "";
 
@@ -100,32 +140,29 @@ async function loadTopGames(steamId) {
 
         let totalHours = 0;
 
-        top.forEach(g => {
+        for (const g of top) {
             totalHours += g.playtime_forever;
 
+            const image = await getGameImage(g.name);
+
             container.innerHTML += `
-                <div>
+                <div style="margin-bottom:10px;">
+                    ${image ? `<img src="${image}" width="150"/>` : ""}
                     <p>${g.name}</p>
                     <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
                 </div>
             `;
-        });
+        }
 
         document.getElementById("totalHours").textContent = Math.floor(totalHours / 60);
+
+        // ✅ Achievements (placeholder)
+        document.getElementById("totalAchievements").textContent = "N/A";
+
+        // ✅ Top genre
+        await calculateTopGenre(top);
 
     } catch (err) {
         console.error("Games failed:", err);
     }
-}
-
-async function getGenre(gameName) {
-    const res = await fetch(
-        `https://api.rawg.io/api/games?key=YOUR_KEY&search=${gameName}`
-    );
-
-    const data = await res.json();
-
-    if (!data.results.length) return "Unknown";
-
-    return data.results[0].genres[0]?.name || "Unknown";
 }

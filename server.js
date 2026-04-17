@@ -3,6 +3,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const Database = require("better-sqlite3");
+const passport = require("passport");
+const SteamStrategy = require("passport-steam").Strategy;
+const session = require("express-session");
 
 const app = express();
 app.use(express.json());
@@ -80,6 +83,51 @@ app.get("/api/profile", (req, res) => {
         res.sendStatus(403);
     }
 });
+
+app.get("/api/steam-user", (req, res) => {
+    if (!req.user) {
+        return res.json({});
+    }
+
+    res.json({
+        steamId: req.user.id
+    });
+});
+
+app.use(session({
+    secret: "steam",
+    resave: false,
+    saveUninitialized: true
+}));
+
+passport.use(new SteamStrategy({
+    returnURL: "https://steamgametracker.onrender.com/auth/steam/return",
+    realm: "https://steamgametracker.onrender.com/",
+    apiKey: process.env.STEAM_API_KEY
+},
+(identifier, profile, done) => {
+    return done(null, profile);
+}));
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/auth/steam",
+    passport.authenticate("steam")
+);
+
+app.get("/auth/steam/return",
+    passport.authenticate("steam", { failureRedirect: "/" }),
+    (req, res) => {
+        const steamId = req.user.id;
+
+        // send Steam ID back to frontend
+        res.redirect(`/?steamId=${steamId}`);
+    }
+);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

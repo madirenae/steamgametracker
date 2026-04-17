@@ -9,49 +9,44 @@
 
 <div class="sparks"></div>
 
-
 <!-- ================= HOME PAGE ================= -->
 <section id="homePage">
 
-<header class="header">
-    <div class="logo">🎮 GameTracker</div>
+    <header class="header">
+        <div class="logo">🎮 GameTracker</div>
 
-    <div class="nav-buttons">
-        <button type="button" onclick="showProfile()">Profile</button>
-    </div>
-</header>
+        <div class="nav-buttons">
+            <button type="button" onclick="checkLogin()">Profile</button>
+        </div>
+    </header>
 
-<div class="home-hero">
-    <h1>Track Your Gaming Like Never Before</h1>
-    <p>All your favorite games, stats, and achievements in one place.</p>
-  <div id="loginPage">
-  <input type="text" id="username" placeholder="Username" />
-  <input type="password" id="password" placeholder="Password" />
+    <div class="home-hero">
+        <h1>Track Your Gaming Like Never Before</h1>
+        <p>All your favorite games, stats, and achievements in one place.</p>
 
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
-</div>
-</div>
-
-<!-- ✅ RESTORED FEATURES -->
-<div class="home-features">
-
-    <div class="feature-card">
-        <h3>Track Playtime</h3>
-        <p>Automatically view your total hours and most played games from Steam.</p>
+        <!-- ✅ Steam Login Button -->
+        <button onclick="connectSteam()">Sign in with Steam</button>
     </div>
 
-    <div class="feature-card">
-        <h3>Save Favorites</h3>
-        <p>Add and organize your favorite games using live game data.</p>
-    </div>
+    <!-- ================= FEATURES ================= -->
+    <div class="home-features">
 
-    <div class="feature-card">
-        <h3>View Stats</h3>
-        <p>Analyze your gaming habits with clean and simple statistics.</p>
-    </div>
+        <div class="feature-card">
+            <h3>Track Playtime</h3>
+            <p>Automatically view your total hours and most played games from Steam.</p>
+        </div>
 
-</div>
+        <div class="feature-card">
+            <h3>Save Favorites</h3>
+            <p>Add and organize your favorite games using live game data.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>View Stats</h3>
+            <p>Analyze your gaming habits with clean and simple statistics.</p>
+        </div>
+
+    </div>
 
 </section>
 
@@ -59,89 +54,89 @@
 <!-- ================= PROFILE PAGE ================= -->
 <section id="profilePage" style="display: none;">
 
-<header class="header">
-    <div class="logo">🎮 GameTracker</div>
+    <header class="header">
+        <div class="logo">🎮 GameTracker</div>
 
-    <div class="nav-buttons">
-        <button type="button" onclick="showHome()">Home</button>
-        <button onclick="logout()">Logout</button>
-    </div>
-</header>
-
-<main class="dashboard">
-
-<section class="profile-card">
-    <h2>Madi</h2>
-
-    <section class="add-stats-card">
-        <h3>Add / Update Stats</h3>
-
-        <input type="number" id="hoursInput" placeholder="Enter hours played" />
-        <input type="number" id="achievementsInput" placeholder="Enter achievements" />
-
-        <select id="platformInput">
-    <option value="PC">PC</option>
-    <option value="Xbox">Xbox</option>
-    <option value="PlayStation">PlayStation</option>
-    <option value="Switch">Switch</option>
-</select>
-
-        <button type="button" onclick="addStats()">Save Stats</button>
-    </section>
-
-    <div class="stats-grid">
-        <div class="stat-box">
-            <h3 id="totalHours">0</h3>
-            <p>Total Hours</p>
+        <div class="nav-buttons">
+            <button type="button" onclick="showHome()">Home</button>
+            <button onclick="logout()">Logout</button>
         </div>
+    </header>
 
-        <div class="stat-box">
-            <h3 id="totalAchievements">0</h3>
-            <p>Achievements</p>
-        </div>
-    </div>
-</section>
+    <main class="dashboard">
 
-<section class="top-games-section">
-    <h3>Top 5 Most Played Games</h3>
-    <div id="topGamesContainer" class="favorites-container"></div>
-</section>
+        <section class="profile-card">
+            <h2 id="usernameDisplay">Loading...</h2>
 
-<section class="rawg-search">
-    <h2>Search and Add Favorite Games</h2>
-    <input type="text" id="rawgSearchInput" placeholder="Enter game name..." />
-    <button type="button" onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
-        Add Game to Favorites
-    </button>
-</section>
+            <section class="add-stats-card">
+                <h3>Add / Update Stats</h3>
 
-<section class="favorites-section">
-    <h2>Your Favorite Games</h2>
-    <div id="favoritesContainer" class="favorites-container"></div>
-</section>
+                <input type="number" id="hoursInput" placeholder="Enter hours played" />
+                <input type="number" id="achievementsInput" placeholder="Enter achievements" />
 
-<!-- ✅ UPDATED STATS OVERVIEW -->
-<section class="statistics-card">
-    <h3>Statistics Overview</h3>
-    <ul>
-        <li>Most Played Genre: <span id="topGenre">Loading...</span></li>
-        <li>Favorite Platform: <span id="topPlatform">Loading...</span></li>
-    </ul>
-</section>
+                <select id="platformInput">
+                    <option value="PC">PC</option>
+                    <option value="Xbox">Xbox</option>
+                    <option value="PlayStation">PlayStation</option>
+                    <option value="Switch">Switch</option>
+                </select>
 
-<section class="notes-card">
-    <h3>Private Notes</h3>
+                <button type="button" onclick="addStats()">Save Stats</button>
+            </section>
 
-    <textarea id="notesInput" placeholder="Type a note and press Enter..."></textarea>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3 id="totalHours">0</h3>
+                    <p>Total Hours</p>
+                </div>
 
-    <div id="notesList"></div>
-</section>
+                <div class="stat-box">
+                    <h3 id="totalAchievements">0</h3>
+                    <p>Achievements</p>
+                </div>
+            </div>
+        </section>
 
-</main>
+        <section class="top-games-section">
+            <h3>Top 5 Most Played Games</h3>
+            <div id="topGamesContainer" class="favorites-container"></div>
+        </section>
 
-<footer class="footer">
-    <p>Twitter | Twitch | Team XYZ Esports</p>
-</footer>
+        <section class="rawg-search">
+            <h2>Search and Add Favorite Games</h2>
+            <input type="text" id="rawgSearchInput" placeholder="Enter game name..." />
+            <button type="button"
+                onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
+                Add Game to Favorites
+            </button>
+        </section>
+
+        <section class="favorites-section">
+            <h2>Your Favorite Games</h2>
+            <div id="favoritesContainer" class="favorites-container"></div>
+        </section>
+
+        <!-- ================= STATS ================= -->
+        <section class="statistics-card">
+            <h3>Statistics Overview</h3>
+            <ul>
+                <li>Most Played Genre: <span id="topGenre">Loading...</span></li>
+                <li>Favorite Platform: <span id="topPlatform">Loading...</span></li>
+            </ul>
+        </section>
+
+        <!-- ================= NOTES ================= -->
+        <section class="notes-card">
+            <h3>Private Notes</h3>
+            <textarea id="notesInput" placeholder="Type a note and press Enter..."></textarea>
+            <div id="notesList"></div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>Twitter | Twitch | Team XYZ Esports</p>
+    </footer>
 
 </section>
 

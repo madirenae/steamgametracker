@@ -1,8 +1,23 @@
-const steamApiKey = "YOUR_STEAM_API_KEY";
+const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
 
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
-    const steamId = localStorage.getItem("steamId");
+    const params = new URLSearchParams(window.location.search);
+    let steamId = params.get("steamId");
+
+    // ✅ If coming back from Steam login
+    if (steamId) {
+        localStorage.setItem("steamId", steamId);
+
+        // clean URL
+        window.history.replaceState({}, document.title, "/");
+
+        showProfile();
+        return;
+    }
+
+    // ✅ If already logged in
+    steamId = localStorage.getItem("steamId");
 
     if (steamId) {
         showProfile();
@@ -35,26 +50,13 @@ async function showProfile() {
 
     const steamId = localStorage.getItem("steamId");
 
-    await loadSteamProfile(steamId);
-    await loadTopGames(steamId);
-}
-
-
-// ================= GET STEAM ID FROM BACKEND =================
-async function fetchSteamId() {
-    try {
-        const res = await fetch("https://steamgametracker.onrender.com/api/steam-user");
-        const data = await res.json();
-
-        if (data.steamId) {
-            localStorage.setItem("steamId", data.steamId);
-            return data.steamId;
-        }
-    } catch (err) {
-        console.error(err);
+    if (!steamId) {
+        console.error("No Steam ID found");
+        return;
     }
 
-    return null;
+    await loadSteamProfile(steamId);
+    await loadTopGames(steamId);
 }
 
 
@@ -68,6 +70,8 @@ async function loadSteamProfile(steamId) {
         const data = await res.json();
 
         const user = data.response.players[0];
+
+        if (!user) return;
 
         document.getElementById("usernameDisplay").textContent = user.personaname;
 
@@ -114,13 +118,3 @@ async function loadTopGames(steamId) {
         console.error("Games failed:", err);
     }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const steamId = params.get("steamId");
-
-    if (steamId) {
-        localStorage.setItem("steamId", steamId);
-        window.history.replaceState({}, document.title, "/");
-    }
-});

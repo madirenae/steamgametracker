@@ -2,10 +2,10 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const Database = require("better-sqlite3");
 const passport = require("passport");
 const SteamStrategy = require("passport-steam").Strategy;
 const session = require("express-session");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
@@ -22,45 +22,40 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ================= DATABASE =================
-const db = new Database("database.db");
-
-db.prepare(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT
-    )
-`).run();
+// ================= SUPABASE =================
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
 
 const SECRET = process.env.SECRET || "supersecretkey";
 
-// ================= AUTH (REGISTER) =================
+// ================= REGISTER =================
 app.post("/api/register", async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-        const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
-        db.prepare(`
-            INSERT INTO users (username, password)
-            VALUES (?, ?)
-        `).run(username, hashed);
+    const { error } = await supabase
+        .from("users")
+        .insert([{ username, password: hashed }]);
 
-        res.json({ message: "User created" });
-
-    } catch (err) {
-        res.status(400).json({ message: "Username already exists" });
+    if (error) {
+        return res.status(400).json({ message: "Username already exists" });
     }
+
+    res.json({ message: "User created" });
 });
 
-// ================= AUTH (LOGIN) =================
+// ================= LOGIN =================
 app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
 
-    const user = db.prepare(`
-        SELECT * FROM users WHERE username = ?
-    `).get(username);
+    const { data: user } = await supabase
+        .from("users")
+        .select("*")
+        .eq("username", username)
+        .single();
 
     if (!user) {
         return res.status(400).json({ message: "User not found" });
@@ -79,20 +74,6 @@ app.post("/api/login", async (req, res) => {
     );
 
     res.json({ token });
-});
-
-// ================= PROTECTED ROUTE =================
-app.get("/api/profile", (req, res) => {
-    const auth = req.headers.authorization;
-    if (!auth) return res.sendStatus(401);
-
-    try {
-        const token = auth.split(" ")[1];
-        const user = jwt.verify(token, SECRET);
-        res.json(user);
-    } catch {
-        res.sendStatus(403);
-    }
 });
 
 // ================= STEAM AUTH =================
@@ -117,23 +98,11 @@ app.get("/auth/steam/return",
     passport.authenticate("steam", { failureRedirect: "/" }),
     (req, res) => {
         const steamId = req.user.id;
-
         res.redirect(`/?steamId=${steamId}`);
     }
 );
 
-// ================= GET STEAM USER =================
-app.get("/api/steam-user", (req, res) => {
-    if (!req.user) {
-        return res.json({});
-    }
-
-    res.json({
-        steamId: req.user.id
-    });
-});
-
-// ================= START SERVER =================
+// ================= START =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

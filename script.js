@@ -2,24 +2,13 @@ const rawgApiKey = "f1bd90ccfc614510a63efb93f4b4d404";
 const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
 const steamId = "76561199072391001";
 
-const Database = require("better-sqlite3");
-const db = new Database("database.db");
-
 const SECRET = process.env.SECRET;
-
-db.prepare(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT
-    )
-`).run();
 
 
 document.addEventListener("DOMContentLoaded", () => {
     createSparks();
 
-    const user = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (user) {
         document.getElementById("loginPage").style.display = "none";
@@ -375,7 +364,7 @@ async function calculateTopGenre() {
 
 
 function getUserNotesKey() {
-    const user = localStorage.getItem("user") || "guest";
+    const user = localStorage.getItem("token") || "guest";
     return "notes_" + user;
 }
 
@@ -470,7 +459,7 @@ async function login() {
     }
 
     try {
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch("https://steamgametracker.onrender.com/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -506,24 +495,28 @@ function logout() {
 }
 
 async function register() {
-   app.post("/api/register", async (req, res) => {
-    const { username, password } = req.body;
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+        alert("Please enter username and password");
+        return;
+    }
 
     try {
-        const hashed = await bcrypt.hash(password, 10);
+        const res = await fetch("https://steamgametracker.onrender.com/api/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password })
+        });
 
-        db.prepare(`
-            INSERT INTO users (username, password)
-            VALUES (?, ?)
-        `).run(username, hashed);
-
-        res.json({ message: "User created" });
+        const data = await res.json();
+        alert(data.message);
 
     } catch (err) {
-        res.status(400).json({ message: "Username already exists" });
+        console.error("Register error:", err);
+        alert("Server error");
     }
-});
-
-    const data = await res.json();
-    alert(data.message);
 }

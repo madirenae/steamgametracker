@@ -66,6 +66,8 @@ async function loadSteamProfile(steamId) {
 
         document.getElementById("usernameDisplay").textContent = user.personaname;
 
+        loadFavorites();
+
     } catch (err) {
         console.error("Profile failed:", err);
     }
@@ -251,6 +253,8 @@ document.getElementById("notesInput").addEventListener("keypress", (e) => {
 async function addToFavoritesRawg(name) {
     if (!name) return;
 
+    const steamId = localStorage.getItem("steamId");
+
     const res = await fetch(
         `https://api.rawg.io/api/games?key=${rawgApiKey}&search=${encodeURIComponent(name)}`
     );
@@ -260,22 +264,29 @@ async function addToFavoritesRawg(name) {
 
     const game = data.results[0];
 
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    favorites.push({
-        name: game.name,
-        image: game.background_image
+    // ✅ save to backend instead of localStorage
+    await fetch("/api/favorites", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            steamId,
+            name: game.name,
+            image: game.background_image
+        })
     });
-
-    localStorage.setItem("favorites", JSON.stringify(favorites));
 
     loadFavorites();
 }
 
-function loadFavorites() {
-    const container = document.getElementById("favoritesContainer");
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+async function loadFavorites() {
+    const steamId = localStorage.getItem("steamId");
 
+    const res = await fetch(`/api/favorites/${steamId}`);
+    const favorites = await res.json();
+
+    const container = document.getElementById("favoritesContainer");
     container.innerHTML = "";
 
     favorites.forEach(g => {

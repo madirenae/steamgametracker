@@ -180,3 +180,28 @@ app.get("/api/steam/achievements/:steamId/:appId", async (req, res) => {
         res.json({ playerstats: { achievements: [] } });
     }
 });
+
+app.post("/api/favorites", async (req, res) => {
+    const { steamId, name, image } = req.body;
+
+    const { error } = await supabase
+        .from("favorites")
+        .insert([{ steam_id: steamId, name, image }]);
+
+    if (error) {
+        return res.status(400).json({ message: "Failed to save favorite" });
+    }
+
+    res.json({ message: "Saved" });
+});
+
+app.get("/api/favorites/:steamId", async (req, res) => {
+    const { steamId } = req.params;
+
+    const { data, error } = await supabase
+        .from("favorites")
+        .select("*")
+        .eq("steam_id", steamId);
+
+    res.json(data || []);
+});

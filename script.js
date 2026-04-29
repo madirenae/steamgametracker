@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // ================= LOGIN =================
 function connectSteam() {
-    window.location.href = "https://steamgametracker.onrender.com/auth/steam";
+    window.location.href = "/auth/steam";
 }
 
 function showLogin() {

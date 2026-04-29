@@ -303,11 +303,29 @@ async function loadFavorites() {
     container.innerHTML = "";
 
     favorites.forEach(g => {
-        container.innerHTML += `
-            <div>
-                <img src="${g.image}" width="120"/>
-                <p>${g.name}</p>
-            </div>
-        `;
+    container.innerHTML += `
+        <div>
+            <img src="${g.image}" width="120"/>
+            <p>${g.name}</p>
+            <button onclick="removeFavorite('${g.name}')">Remove</button>
+        </div>
+    `;
+});
+}
+
+async function removeFavorite(name) {
+    const steamId = localStorage.getItem("steamId");
+
+    await fetch(`${API_BASE}/api/favorites`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            steamId,
+            name
+        })
     });
+
+    loadFavorites(); // refresh list
 }

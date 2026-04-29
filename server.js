@@ -206,3 +206,20 @@ app.get("/api/favorites/:steamId", async (req, res) => {
 
     res.json(data || []);
 });
+
+app.delete("/api/favorites", async (req, res) => {
+    const { steamId, name } = req.body;
+
+    const { error } = await supabase
+        .from("favorites")
+        .delete()
+        .eq("steam_id", steamId)
+        .eq("name", name);
+
+    if (error) {
+        console.error(error);
+        return res.status(400).json({ message: "Failed to delete" });
+    }
+
+    res.json({ message: "Deleted" });
+});

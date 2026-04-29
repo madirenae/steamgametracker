@@ -408,3 +408,22 @@ button:hover {
 .stats-bar input:focus {
   box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
 }
+
+.stat-display {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-display div {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-display p {
+  font-size: 20px;
+  font-weight: bold;
+}

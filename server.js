@@ -186,7 +186,7 @@ app.post("/api/favorites", async (req, res) => {
 
     const { error } = await supabase
         .from("favorites")
-        .insert([{ steam_id: steamId, name, image }]);
+        .insert([{ steam_id: Number(steamId), name, image }]);
 
     if (error) {
         return res.status(400).json({ message: "Failed to save favorite" });
@@ -201,7 +201,7 @@ app.get("/api/favorites/:steamId", async (req, res) => {
     const { data, error } = await supabase
         .from("favorites")
         .select("*")
-        .eq("steam_id", steamId);
+        .eq("steam_id", Number(steamId));
 
     res.json(data || []);
 });

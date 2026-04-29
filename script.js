@@ -296,6 +296,8 @@ async function loadFavorites() {
     const res = await fetch(`/api/favorites/${steamId}`);
     const favorites = await res.json();
 
+    console.log("FETCHED:", favorites);
+
     const container = document.getElementById("favoritesContainer");
     container.innerHTML = "";
 

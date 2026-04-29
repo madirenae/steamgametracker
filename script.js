@@ -255,6 +255,8 @@ document.getElementById("notesInput").addEventListener("keypress", (e) => {
 
 //======================Fav Games===============
 
+const API_BASE = "https://steamgametracker.onrender.com";
+
 async function addToFavoritesRawg(name) {
     if (!name) return;
 
@@ -269,13 +271,13 @@ async function addToFavoritesRawg(name) {
 
     const game = data.results[0];
 
-   console.log({
-    steamId,
-    name: game.name,
-    image: game.background_image
-});
+    console.log({
+        steamId,
+        name: game.name,
+        image: game.background_image
+    });
 
-    await fetch("/api/favorites", {
+    await fetch(`${API_BASE}/api/favorites`, { // ✅ FIXED
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -293,7 +295,7 @@ async function addToFavoritesRawg(name) {
 async function loadFavorites() {
     const steamId = localStorage.getItem("steamId");
 
-    const res = await fetch(`/api/favorites/${steamId}`);
+    const res = await fetch(`${API_BASE}/api/favorites/${steamId}`); // ✅ FIXED
     const favorites = await res.json();
 
     console.log("FETCHED:", favorites);

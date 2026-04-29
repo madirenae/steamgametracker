@@ -1,6 +1,9 @@
 const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
 const rawgApiKey = "f1bd90ccfc614510a63efb93f4b4d404";
 
+window.addStats = addStats;
+window.addToFavoritesRawg = addToFavoritesRawg;
+
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
     const params = new URLSearchParams(window.location.search);
@@ -173,7 +176,8 @@ async function loadTopGames(steamId) {
     }
 }
 
-//Achievments
+//===============Achievments==========================
+
 async function getAchievementsCount(steamId, appId) {
     try {
         const res = await fetch(
@@ -189,4 +193,92 @@ async function getAchievementsCount(steamId, appId) {
     } catch {
         return 0;
     }
+}
+
+//===============Add Stats======================
+
+function addStats() {
+    const hours = Number(document.getElementById("hoursInput").value) || 0;
+    const achievements = Number(document.getElementById("achievementsInput").value) || 0;
+
+    let savedHours = Number(localStorage.getItem("totalHours")) || 0;
+    let savedAchievements = Number(localStorage.getItem("totalAchievements")) || 0;
+
+    savedHours += hours;
+    savedAchievements += achievements;
+
+    localStorage.setItem("totalHours", savedHours);
+    localStorage.setItem("totalAchievements", savedAchievements);
+
+    document.getElementById("totalHours").textContent = savedHours;
+    document.getElementById("totalAchievements").textContent = savedAchievements;
+}
+
+//=======================Notes=========================
+
+function loadNotes() {
+    const notes = JSON.parse(localStorage.getItem("notes")) || [];
+    const container = document.getElementById("notesList");
+    container.innerHTML = "";
+
+    notes.forEach(n => {
+        container.innerHTML += `<p>${n}</p>`;
+    });
+}
+
+document.getElementById("notesInput").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        const note = e.target.value.trim();
+        if (!note) return;
+
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.push(note);
+
+        localStorage.setItem("notes", JSON.stringify(notes));
+        e.target.value = "";
+
+        loadNotes();
+    }
+});
+
+//======================Fav Games===============
+
+async function addToFavoritesRawg(name) {
+    if (!name) return;
+
+    const res = await fetch(
+        `https://api.rawg.io/api/games?key=${rawgApiKey}&search=${encodeURIComponent(name)}`
+    );
+
+    const data = await res.json();
+    if (!data.results.length) return;
+
+    const game = data.results[0];
+
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    favorites.push({
+        name: game.name,
+        image: game.background_image
+    });
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+
+    loadFavorites();
+}
+
+function loadFavorites() {
+    const container = document.getElementById("favoritesContainer");
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    container.innerHTML = "";
+
+    favorites.forEach(g => {
+        container.innerHTML += `
+            <div>
+                <img src="${g.image}" width="120"/>
+                <p>${g.name}</p>
+            </div>
+        `;
+    });
 }

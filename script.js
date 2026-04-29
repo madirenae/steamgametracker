@@ -132,17 +132,25 @@ async function loadTopGames(steamId) {
 
         if (!data.response.games) return;
 
-        const top = data.response.games
+        const allGames = data.response.games;
+
+        // ✅ TOTAL HOURS (ALL games)
+        let totalHours = 0;
+        allGames.forEach(g => {
+            totalHours += g.playtime_forever;
+        });
+
+        document.getElementById("totalHours").textContent =
+            Math.floor(totalHours / 60);
+
+        // ✅ TOP 5 (for display only)
+        const top = [...allGames]
             .sort((a, b) => b.playtime_forever - a.playtime_forever)
             .slice(0, 5);
 
-        let totalHours = 0;
         let totalAchievements = 0;
 
-        // ✅ NOW THIS WORKS
         for (const g of top) {
-            totalHours += g.playtime_forever;
-
             const image = await getGameImage(g.name);
             const achievements = await getAchievementsCount(steamId, g.appid);
 
@@ -158,7 +166,6 @@ async function loadTopGames(steamId) {
             `;
         }
 
-        document.getElementById("totalHours").textContent = Math.floor(totalHours / 60);
         document.getElementById("totalAchievements").textContent = totalAchievements;
 
     } catch (err) {

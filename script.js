@@ -172,13 +172,17 @@ async function loadTopGames(steamId) {
             totalAchievements += achievements;
 
             container.innerHTML += `
-                <div style="margin-bottom:10px;">
-                    ${image ? `<img src="${image}" width="150"/>` : ""}
-                    <p>${g.name}</p>
-                    <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
-                    <p>🏆 ${achievements} achievements</p>
-                </div>
-            `;
+  <div class="game-card">
+    ${image ? `<img src="${image}" class="game-img"/>` : ""}
+    <div class="game-overlay"></div>
+    <div class="game-info">
+      <p class="game-title">${g.name}</p>
+      <p class="game-hours">${Math.floor(g.playtime_forever / 60)} hrs</p>
+      <p class="game-achievements">🏆 ${achievements}</p>
+      <p class="rank">#${index + 1}</p>
+    </div>
+  </div>
+`;
         }
 
         document.getElementById("totalAchievements").textContent = totalAchievements;
@@ -308,7 +312,7 @@ async function loadFavorites() {
         <div>
             <img src="${g.image}" width="120"/>
             <p>${g.name}</p>
-            <button onclick="removeFavorite(${g.id})">Remove</button>
+            <button onclick="removeFavorite(${g.id})">x</button>
         </div>
     `;
 });

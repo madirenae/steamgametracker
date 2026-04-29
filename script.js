@@ -100,6 +100,7 @@ async function calculateTopGenre(games) {
             );
 
             const data = await res.json();
+
             if (!data.results.length) continue;
 
             const genres = data.results[0].genres;
@@ -108,7 +109,9 @@ async function calculateTopGenre(games) {
                 genreCount[genre.name] = (genreCount[genre.name] || 0) + 1;
             });
 
-        } catch {}
+        } catch (err) {
+            console.error("Genre fetch failed:", err);
+        }
     }
 
     let topGenre = "Unknown";
@@ -170,6 +173,8 @@ async function loadTopGames(steamId) {
         }
 
         document.getElementById("totalAchievements").textContent = totalAchievements;
+
+        await calculateTopGenre(top);
 
     } catch (err) {
         console.error("Games failed:", err);

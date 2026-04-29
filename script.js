@@ -320,6 +320,8 @@ async function addToFavoritesRawg(name) {
     });
 
     loadFavorites();
+
+    document.getElementById("rawgSearchInput").value = "";
 }
 
 async function loadFavorites() {

@@ -427,3 +427,22 @@ button:hover {
   font-size: 20px;
   font-weight: bold;
 }
+
+.add-stats-card,
+.favorites-add-card {
+    margin-top: 20px;
+}
+
+.add-stats-card h3,
+.favorites-add-card h3 {
+    margin-bottom: 10px;
+}
+
+.fav-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.fav-input-row input {
+    flex: 1;
+}

@@ -82,13 +82,13 @@
 
     <!-- INPUT BAR -->
     <div class="stats-bar">
+        <h3>Update Stats</h3>
+
         <input type="number" id="hoursInput" placeholder="Hours played" />
         <input type="number" id="achievementsInput" placeholder="Achievements" />
 
         <select id="platformSelect">
             <option>PC</option>
-            <option>Xbox</option>
-            <option>PlayStation</option>
         </select>
 
         <button onclick="addStats()">Save</button>
@@ -100,14 +100,21 @@
             <div id="topGamesContainer" class="favorites-container"></div>
         </section>
 
-        <section class="rawg-search">
-            <h2>Search and Add Favorite Games</h2>
-            <input type="text" id="rawgSearchInput" placeholder="Enter game name..." />
-            <button type="button"
-                onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
-                Add Game to Favorites
-            </button>
-        </section>
+        <div class="favorites-add-card">
+    <h3>Add Favorite Game</h3>
+
+    <div class="fav-input-row">
+        <input
+            type="text"
+            id="rawgSearchInput"
+            placeholder="Search for a game..."
+        />
+
+        <button onclick="addToFavoritesRawg(document.getElementById('rawgSearchInput').value)">
+            + Add
+        </button>
+    </div>
+</div>
 
         <section class="favorites-section">
             <h2>Your Favorite Games</h2>

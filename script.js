@@ -122,25 +122,48 @@ async function calculateTopGenre(games) {
 }
 
 // ================= LOAD GAMES =================
-let totalAchievements = 0;
+async function loadTopGames(steamId) {
+    try {
+        const res = await fetch(`/api/steam/games/${steamId}`);
+        const data = await res.json();
 
-for (const g of top) {
-    totalHours += g.playtime_forever;
+        const container = document.getElementById("topGamesContainer");
+        container.innerHTML = "";
 
-    const image = await getGameImage(g.name);
+        if (!data.response.games) return;
 
-    // 🔥 NEW: get achievements
-    const achievements = await getAchievementsCount(steamId, g.appid);
-    totalAchievements += achievements;
+        const top = data.response.games
+            .sort((a, b) => b.playtime_forever - a.playtime_forever)
+            .slice(0, 5);
 
-    container.innerHTML += `
-        <div style="margin-bottom:10px;">
-            ${image ? `<img src="${image}" width="150"/>` : ""}
-            <p>${g.name}</p>
-            <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
-            <p>🏆 ${achievements} achievements</p>
-        </div>
-    `;
+        let totalHours = 0;
+        let totalAchievements = 0;
+
+        // ✅ NOW THIS WORKS
+        for (const g of top) {
+            totalHours += g.playtime_forever;
+
+            const image = await getGameImage(g.name);
+            const achievements = await getAchievementsCount(steamId, g.appid);
+
+            totalAchievements += achievements;
+
+            container.innerHTML += `
+                <div style="margin-bottom:10px;">
+                    ${image ? `<img src="${image}" width="150"/>` : ""}
+                    <p>${g.name}</p>
+                    <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
+                    <p>🏆 ${achievements} achievements</p>
+                </div>
+            `;
+        }
+
+        document.getElementById("totalHours").textContent = Math.floor(totalHours / 60);
+        document.getElementById("totalAchievements").textContent = totalAchievements;
+
+    } catch (err) {
+        console.error("Games failed:", err);
+    }
 }
 
 //Achievments

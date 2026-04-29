@@ -4,6 +4,7 @@ const API_BASE = "https://steamgametracker.onrender.com";
 
 window.addStats = addStats;
 window.addToFavoritesRawg = addToFavoritesRawg;
+window.removeFavorite = removeFavorite;
 
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
@@ -307,25 +308,18 @@ async function loadFavorites() {
         <div>
             <img src="${g.image}" width="120"/>
             <p>${g.name}</p>
-            <button onclick="removeFavorite('${g.name}')">Remove</button>
+            <button onclick="removeFavorite(${g.id})">Remove</button>
         </div>
     `;
 });
 }
 
-async function removeFavorite(name) {
-    const steamId = localStorage.getItem("steamId");
+async function removeFavorite(id) {
+    console.log("Deleting ID:", id); // 👈 DEBUG
 
-    await fetch(`${API_BASE}/api/favorites`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            steamId,
-            name
-        })
+    await fetch(`${API_BASE}/api/favorites/${id}`, {
+        method: "DELETE"
     });
 
-    loadFavorites(); // refresh list
+    loadFavorites();
 }

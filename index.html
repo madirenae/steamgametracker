@@ -65,29 +65,35 @@
     <main class="dashboard">
 
         <section class="profile-card">
-            <h2 id="usernameDisplay">Loading...</h2>
+    <h2 id="usernameDisplay">Loading...</h2>
 
-            <div class="stat-display">
-            </section>
-  <div>
-    <p id="totalHours">0</p>
-    <span>Total Hours</span>
-  </div>
+    <!-- STATS DISPLAY -->
+    <div class="stats-display">
+        <div class="stat-box">
+            <p id="totalHours">0</p>
+            <span>Total Hours</span>
+        </div>
 
-  <div>
-    <p id="totalAchievements">0</p>
-    <span>Achievements</span>
-  </div>
-</div>
+        <div class="stat-box">
+            <p id="totalAchievements">0</p>
+            <span>Achievements</span>
+        </div>
+    </div>
 
-  <select id="platformSelect">
-    <option>PC</option>
-    <option>Xbox</option>
-    <option>PlayStation</option>
-  </select>
+    <!-- INPUT BAR -->
+    <div class="stats-bar">
+        <input type="number" id="hoursInput" placeholder="Hours played" />
+        <input type="number" id="achievementsInput" placeholder="Achievements" />
 
-  <button onclick="addStats()">Save</button>
-</div>
+        <select id="platformSelect">
+            <option>PC</option>
+            <option>Xbox</option>
+            <option>PlayStation</option>
+        </select>
+
+        <button onclick="addStats()">Save</button>
+    </div>
+</section>
 
         <section class="top-games-section">
             <h3>Top 5 Most Played Games</h3>

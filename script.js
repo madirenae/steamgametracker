@@ -163,25 +163,31 @@ async function loadTopGames(steamId) {
             .sort((a, b) => b.playtime_forever - a.playtime_forever)
             .slice(0, 5);
 
-        let totalAchievements = 0;
+        const gameData = await Promise.all(
+            top.map(async (g, index) => {
+                const image = await getGameImage(g.name);
+                const achievements = await getAchievementsCount(steamId, g.appid);
 
-        for (let index = 0; index < top.length; index++) {
-    const g = top[index];
+    return { g, index, image, achievements };
+  })
+);
 
-    const image = await getGameImage(g.name);
-    const achievements = await getAchievementsCount(steamId, g.appid);
+let totalAchievements = 0;
 
-    container.innerHTML += `
-      <div class="game-card">
-        ${image ? `<img src="${image}" class="game-img"/>` : ""}
-        <div class="game-info">
-          <p class="game-title">#${index + 1} ${g.name}</p>
-          <p class="game-hours">${Math.floor(g.playtime_forever / 60)} hrs</p>
-          <p class="game-achievements">🏆 ${achievements}</p>
-        </div>
+gameData.forEach(({ g, index, image, achievements }) => {
+  totalAchievements += achievements;
+
+  container.innerHTML += `
+    <div class="game-card">
+      ${image ? `<img src="${image}" class="game-img"/>` : ""}
+      <div class="game-info">
+        <p class="game-title">#${index + 1} ${g.name}</p>
+        <p class="game-hours">${Math.floor(g.playtime_forever / 60)} hrs</p>
+        <p class="game-achievements">🏆 ${achievements}</p>
       </div>
-    `;
-}
+    </div>
+  `;
+});
 
         document.getElementById("totalAchievements").textContent = totalAchievements;
 

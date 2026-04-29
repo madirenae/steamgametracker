@@ -67,34 +67,18 @@
         <section class="profile-card">
             <h2 id="usernameDisplay">Loading...</h2>
 
-            <section class="add-stats-card">
-                <h3>Add / Update Stats</h3>
+            <div class="stats-bar">
+  <input type="number" id="hoursInput" placeholder="Hours played" />
+  <input type="number" id="achievementsInput" placeholder="Achievements" />
 
-                <input type="number" id="hoursInput" placeholder="Enter hours played" />
-                <input type="number" id="achievementsInput" placeholder="Enter achievements" />
+  <select id="platformSelect">
+    <option>PC</option>
+    <option>Xbox</option>
+    <option>PlayStation</option>
+  </select>
 
-                <select id="platformInput">
-                    <option value="PC">PC</option>
-                    <option value="Xbox">Xbox</option>
-                    <option value="PlayStation">PlayStation</option>
-                    <option value="Switch">Switch</option>
-                </select>
-
-                <button type="button" onclick="addStats()">Save Stats</button>
-            </section>
-
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <h3 id="totalHours">0</h3>
-                    <p>Total Hours</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3 id="totalAchievements">0</h3>
-                    <p>Achievements</p>
-                </div>
-            </div>
-        </section>
+  <button onclick="addStats()">Save</button>
+</div>
 
         <section class="top-games-section">
             <h3>Top 5 Most Played Games</h3>

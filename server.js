@@ -215,7 +215,7 @@ app.delete("/api/favorites/:id", async (req, res) => {
     const { error } = await supabase
         .from("favorites")
         .delete()
-        .eq("id", id);
+        .eq("id", Number(id));
 
     if (error) {
         console.error(error);

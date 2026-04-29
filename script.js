@@ -122,47 +122,41 @@ async function calculateTopGenre(games) {
 }
 
 // ================= LOAD GAMES =================
-async function loadTopGames(steamId) {
+let totalAchievements = 0;
+
+for (const g of top) {
+    totalHours += g.playtime_forever;
+
+    const image = await getGameImage(g.name);
+
+    // 🔥 NEW: get achievements
+    const achievements = await getAchievementsCount(steamId, g.appid);
+    totalAchievements += achievements;
+
+    container.innerHTML += `
+        <div style="margin-bottom:10px;">
+            ${image ? `<img src="${image}" width="150"/>` : ""}
+            <p>${g.name}</p>
+            <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
+            <p>🏆 ${achievements} achievements</p>
+        </div>
+    `;
+}
+
+//Achievments
+async function getAchievementsCount(steamId, appId) {
     try {
         const res = await fetch(
-            `https://steamgametracker.onrender.com/api/steam/games/${steamId}`
+            `https://steamgametracker.onrender.com/api/steam/achievements/${steamId}/${appId}`
         );
 
         const data = await res.json();
-        const container = document.getElementById("topGamesContainer");
-        container.innerHTML = "";
 
-        if (!data.response.games) return;
+        if (!data.playerstats || !data.playerstats.achievements) return 0;
 
-        const top = data.response.games
-            .sort((a, b) => b.playtime_forever - a.playtime_forever)
-            .slice(0, 5);
+        return data.playerstats.achievements.filter(a => a.achieved === 1).length;
 
-        let totalHours = 0;
-
-        for (const g of top) {
-            totalHours += g.playtime_forever;
-
-            const image = await getGameImage(g.name);
-
-            container.innerHTML += `
-                <div style="margin-bottom:10px;">
-                    ${image ? `<img src="${image}" width="150"/>` : ""}
-                    <p>${g.name}</p>
-                    <p>${Math.floor(g.playtime_forever / 60)} hrs</p>
-                </div>
-            `;
-        }
-
-        document.getElementById("totalHours").textContent = Math.floor(totalHours / 60);
-
-        // ✅ Achievements (placeholder)
-        document.getElementById("totalAchievements").textContent = "N/A";
-
-        // ✅ Top genre
-        await calculateTopGenre(top);
-
-    } catch (err) {
-        console.error("Games failed:", err);
+    } catch {
+        return 0;
     }
 }

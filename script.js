@@ -1,5 +1,6 @@
 const steamApiKey = "AD6EE8C9113AD95F0D932536F11DAD67";
 const rawgApiKey = "f1bd90ccfc614510a63efb93f4b4d404";
+const API_BASE = "https://steamgametracker.onrender.com";
 
 window.addStats = addStats;
 window.addToFavoritesRawg = addToFavoritesRawg;
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // ================= LOGIN =================
 function connectSteam() {
-    window.location.href = "/auth/steam";
+    window.location.href = `${API_BASE}/auth/steam`;
 }
 
 function showLogin() {
@@ -137,7 +138,7 @@ async function calculateTopGenre(games) {
 // ================= LOAD GAMES =================
 async function loadTopGames(steamId) {
     try {
-        const res = await fetch(`/api/steam/games/${steamId}`);
+        const res = await fetch(`${API_BASE}/api/steam/games/${steamId}`);
         const data = await res.json();
 
         const container = document.getElementById("topGamesContainer");
@@ -254,8 +255,6 @@ document.getElementById("notesInput").addEventListener("keypress", (e) => {
 });
 
 //======================Fav Games===============
-
-const API_BASE = "https://steamgametracker.onrender.com";
 
 async function addToFavoritesRawg(name) {
     if (!name) return;

@@ -6,23 +6,28 @@ window.addToFavoritesRawg = addToFavoritesRawg;
 
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
-    const params = new URLSearchParams(window.location.search);
-    let steamId = params.get("steamId");
+  const params = new URLSearchParams(window.location.search);
+  let steamId = params.get("steamId");
 
-    if (steamId) {
-        localStorage.setItem("steamId", steamId);
-        window.history.replaceState({}, document.title, "/");
-        showProfile();
-        return;
-    }
+  // If coming from URL
+  if (steamId) {
+    localStorage.setItem("steamId", steamId);
+    window.history.replaceState({}, document.title, "/");
+  }
 
-    steamId = localStorage.getItem("steamId");
+  // Fallback (for testing)
+  if (!localStorage.getItem("steamId")) {
+    localStorage.setItem("steamId", "76561199072391001");
+  }
 
-    if (steamId) {
-        showProfile();
-    } else {
-        showLogin();
-    }
+  steamId = localStorage.getItem("steamId");
+
+  if (steamId) {
+    showProfile();
+    loadFavorites(); // ✅ THIS is what you were missing
+  } else {
+    showLogin();
+  }
 });
 
 // ================= LOGIN =================

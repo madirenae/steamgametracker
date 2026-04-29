@@ -5,6 +5,7 @@ const API_BASE = "https://steamgametracker.onrender.com";
 window.addStats = addStats;
 window.addToFavoritesRawg = addToFavoritesRawg;
 window.removeFavorite = removeFavorite;
+window.removeNote = removeNote;
 
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", async () => {
@@ -243,8 +244,16 @@ function loadNotes() {
     const container = document.getElementById("notesList");
     container.innerHTML = "";
 
-    notes.forEach(n => {
-        container.innerHTML += `<p>${n}</p>`;
+    notes.forEach((n, index) => {
+        container.innerHTML += `
+            <div class="note-item">
+                <div>
+                    <p class="note-text">${n.text}</p>
+                    <span class="note-time">${n.time}</span>
+                </div>
+                <button onclick="removeNote(${index})">✖</button>
+            </div>
+        `;
     });
 }
 
@@ -254,7 +263,10 @@ document.getElementById("notesInput").addEventListener("keypress", (e) => {
         if (!note) return;
 
         let notes = JSON.parse(localStorage.getItem("notes")) || [];
-        notes.push(note);
+        notes.push({
+            text: note,
+            time: new Date().toLocaleString()
+});
 
         localStorage.setItem("notes", JSON.stringify(notes));
         e.target.value = "";
@@ -262,6 +274,16 @@ document.getElementById("notesInput").addEventListener("keypress", (e) => {
         loadNotes();
     }
 });
+
+function removeNote(index) {
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+    notes.splice(index, 1);
+
+    localStorage.setItem("notes", JSON.stringify(notes));
+
+    loadNotes();
+}
 
 //======================Fav Games===============
 

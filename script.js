@@ -264,7 +264,12 @@ async function addToFavoritesRawg(name) {
 
     const game = data.results[0];
 
-    // ✅ save to backend instead of localStorage
+   console.log({
+    steamId,
+    name: game.name,
+    image: game.background_image
+});
+
     await fetch("/api/favorites", {
         method: "POST",
         headers: {

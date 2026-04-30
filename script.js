@@ -12,22 +12,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   let steamId = params.get("steamId");
 
-  // If coming from URL
   if (steamId) {
     localStorage.setItem("steamId", steamId);
     window.history.replaceState({}, document.title, "/");
-  }
-
-  // Fallback (for testing)
-  if (!localStorage.getItem("steamId")) {
-    localStorage.setItem("steamId", "76561199072391001");
   }
 
   steamId = localStorage.getItem("steamId");
 
   if (steamId) {
     showProfile();
-    loadFavorites(); // ✅ THIS is what you were missing
+    loadFavorites(); 
   } else {
     showLogin();
   }
@@ -83,6 +77,16 @@ async function loadSteamProfile(steamId) {
 
     } catch (err) {
         console.error("Profile failed:", err);
+    }
+}
+
+function checkLogin() {
+    const steamId = localStorage.getItem("steamId");
+
+    if (steamId) {
+        showProfile();
+    } else {
+        alert("Please sign in with Steam first.");
     }
 }
 

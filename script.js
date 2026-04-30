@@ -60,6 +60,11 @@ async function showProfile() {
     await loadTopGames(steamId);
 }
 
+function showHome() {
+    document.getElementById("homePage").style.display = "block";
+    document.getElementById("profilePage").style.display = "none";
+}
+
 // ================= LOAD PROFILE =================
 async function loadSteamProfile(steamId) {
     try {
